@@ -9,6 +9,8 @@ Copy the official firmware update to `PSP/GAME/UPDATE/EBOOT.PBP` on your memory 
 The downgrader is "signed", and can be launched without having a custom firmware installed. Once you run the application, follow the on-screen instructions.
 
 ## Changelog
+### Version 7.6.2
+* Added more user friendly firmware error output. If not running a firmware that is supported that is.
 ### Version 7.6.1
 * Added more print statements for less common issues with parsing EBOOT.PBP or the buffer
 ### Version 7.6
