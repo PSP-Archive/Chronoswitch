@@ -27,11 +27,11 @@
 #include "kernel_exploit.h"
 #include "rebootex.h"
 
-PSP_MODULE_INFO("Chronoswitch", 0, 7, 61);
+PSP_MODULE_INFO("Chronoswitch", 0, 7, 63);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_VFPU);
 PSP_HEAP_SIZE_KB(3 << 10);
 
-#define DOWNGRADER_VER    ("7.6.1")
+#define DOWNGRADER_VER    ("7.6.3")
 
 
 typedef struct __attribute__((packed))
@@ -77,15 +77,25 @@ u32 get_updater_version(char *argv)
 	status = sceIoGetstat(eboot_path, &stats);
 
 	int go_fw = -1;
+	int size = 0;
 
 	int go_check = sceIoOpen(eboot_path, PSP_O_RDONLY, 0);
-	sceIoLseek32(go_check, 0x346F, PSP_SEEK_SET);
-	u8 go_buf[1] = { 0 };
-	sceIoRead(go_check, go_buf, 1);
-	if(go_buf[0] == 0x63)
-		go_fw = 1;
-	sceIoLseek32(go_check, 0, PSP_SEEK_SET);
+	u8 digest[16] = { 0 };
+	u8 go_buf[0x2000] = { 0 };
+	SceKernelUtilsMd5Context ctx;
+	sceKernelUtilsMd5BlockInit(&ctx);
+	printf("Checking md5sum for EBOOT... Please wait...\n");
+	while((size = sceIoRead(go_check, go_buf, sizeof(go_buf))) > 0) {
+        sceKernelUtilsMd5BlockUpdate(&ctx, go_buf, size);
+    }
 	sceIoClose(go_check);
+
+
+	u8 go_md5sum[16] = { 0xFD, 0x0F, 0x7D, 0x07, 0x98, 0xB4, 0xF6, 0xE6, 0xD3, 0x2E, 0xF9, 0x58, 0x36, 0x74, 0x05, 0x27 }; // PSP GO MD5 SUM
+
+
+	if(!memcmp(go_md5sum, digest, 16))
+		go_fw = 1;
 
 	if(status < 0 && !strstr(argv, "ef0")) {
 		printf("\nHmmmm? Are you sure you have EBOOT.PBP in PSP/GAME/UPDATE/ ???\n");
