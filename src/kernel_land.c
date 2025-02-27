@@ -29,6 +29,7 @@ SceModule2 *(* pspKernelFindModuleByName)(const char *name) = NULL;
 int (* pspKernelLoadExecVSHEf1)(const char *path, struct SceKernelLoadExecVSHParam *param) = NULL;
 int (* pspKernelLoadExecVSHMs1)(const char *path, struct SceKernelLoadExecVSHParam *param) = NULL;
 SceUID (* pspIoOpen)(char *file, int flags, SceMode mode) = NULL;
+SceUID (* pspIoRead)(int fd, void* data, int size) = NULL;
 int (* pspIoWrite)(SceUID fd, void *data, u32 len) = NULL;
 int (* pspIoClose)(SceUID fd) = NULL;
 int (* pspIoAssign)(const char *dev1, const char *dev2, const char *dev3, int mode, void *unk1, long unk2) = NULL;
@@ -73,19 +74,35 @@ int delete_resume_game(void)
 	
 	/* align to 64 */
 	header = (u8 *)((u32)header & ~0x3F); header = (u8 *)((u32)header + 0x40);
-	
-	/* now clear it */
-	memset(header, 0, 512);
+
 	
 	/* open hibernation fs */
 	SceUID fd = pspIoOpen("eflash0a:__hibernation", 0x04000003, 0);
-	
+
 	/* check for error */
 	if (fd < 0)
 	{
 		/* return error */
 		return fd;
 	}
+
+
+	pspIoRead(fd, header, 512);
+	int hib_found = -1;
+	int i = 0;
+	for(; i < 512; i++) {
+		if(header[i] != '\0')
+			hib_found = 1;
+	}
+
+	if(hib_found < 0) {
+		pspIoClose(fd);
+		return 0x45;
+	}
+	
+
+	/* now clear it */
+	memset(header, 0, 512);
 	
 	/* write the blank header */
 	int written = pspIoWrite(fd, header, 512);

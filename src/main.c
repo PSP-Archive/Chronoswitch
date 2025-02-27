@@ -27,11 +27,11 @@
 #include "kernel_exploit.h"
 #include "rebootex.h"
 
-PSP_MODULE_INFO("Chronoswitch", 0, 7, 64);
+PSP_MODULE_INFO("Chronoswitch", 0, 7, 65);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_VFPU);
 PSP_HEAP_SIZE_KB(3 << 10);
 
-#define DOWNGRADER_VER    ("7.6.4")
+#define DOWNGRADER_VER    ("7.6.5")
 
 
 typedef struct __attribute__((packed))
@@ -409,6 +409,12 @@ int main(int argc, char *argv[])
     /* check for pspgo */
     if (model == 4)
     {
+		/* check if there is a resume game */
+        if (execKernelFunction(delete_resume_game) == 0x45)
+        {
+			goto good;
+        }
+
         printf("\n" "Your PSPgo will require deletion of the [Resume Game] if one is saved. Proceed? (X = Yes, R = No)\n");
         
         while (1)
@@ -438,6 +444,7 @@ int main(int argc, char *argv[])
             ErrorExit(5000, "Error deleting [Resume Game]. Exiting for safety reasons.\n");
         }
     }
+good:;
     
     int isInfinity = !(infGetVersion() & 0x80000000);
     
@@ -468,7 +475,7 @@ int main(int argc, char *argv[])
     
     /* do confirmation stuff */
 	if(model == 4 && strstr(argv[0], "ef0")) {
-    	printf("\nX to continue, R to exit.\n");
+    	printf("\nEBOOT.PBP is correct press X to continue, R to exit.\n");
 	}
 	else {
     	printf("\n" "Currently Running: %X.%X going to Downgrade/Reinstall: %X.%X.\n", (g_devkit_version >> 24) & 0xF, ((g_devkit_version >> 12) & 0xF0) | ((g_devkit_version >> 8) & 0xF), (upd_ver >> 8) & 0xF, upd_ver & 0xFF);

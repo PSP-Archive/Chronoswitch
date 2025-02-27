@@ -16,8 +16,6 @@ int launch_updater(void);
 int reassign(void);
 int delete_resume_game(void);
 
-//extern char eboot_path[];
-
 extern int (* pspKernelGetModel)(void);
 extern int (* pspSysconGetBaryonVersion)(u32 *baryon);
 extern SceModule2 *(* pspKernelFindModuleByName)(const char *name);
@@ -26,7 +24,7 @@ extern int (* pspKernelLoadExecVSHMs1)(const char *path, struct SceKernelLoadExe
 extern SceUID (* pspIoOpen)(char *file, int flags, SceMode mode);
 extern int (* pspIoWrite)(SceUID fd, void *data, u32 len);
 extern int (* pspIoClose)(SceUID fd);
-extern int (* pspIoRead)(int fd, void* data, int size);
+extern SceUID (* pspIoRead)(int fd, void* data, int size);
 extern int (* pspIoAssign)(const char *dev1, const char *dev2, const char *dev3, int mode, void *unk1, long unk2);
 extern int (* pspIoUnAssign)(const char *dev);
 extern int (* pspIoLseek32)(int fd, int offset, int whence);
