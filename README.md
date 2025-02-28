@@ -9,6 +9,11 @@ Copy the official firmware update to `PSP/GAME/UPDATE/EBOOT.PBP` on your memory 
 The downgrader is "signed", and can be launched without having a custom firmware installed. Once you run the application, follow the on-screen instructions.
 
 ## Changelog
+### Version 7.6.5
+* PSP GO: Detect if there is a Resume Game hibernation file or not.
+### Version 7.6.4
+* md5 checksum for PSP GO supported firmware.
+* Yep I skipped over 7.6.3 somehow....
 ### Version 7.6.2
 * Added more user friendly firmware error output. If not running a firmware that is supported that is.
 ### Version 7.6.1
